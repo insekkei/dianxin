@@ -1,0 +1,280 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <title>用户绑定</title>
+    <link rel="stylesheet" href="./css/jquery.mobile-1.4.2.min.css" />
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/bangding.css">
+	<link rel="stylesheet" href="./css/comm.css" type="text/css" charset="utf-8">
+    <script src="./js/jquery-1.9.1.min.js"></script>
+    <script src="./js/jquery.mobile-1.4.2.min.js"></script>
+	<script src="./js/comm.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+	//====================================
+	//cong.han 2014.4.20
+	//判断手机号码格式
+	//====================================
+$(document).ready(function()
+	{
+		$('#a').show();
+		//判断手机号码格式是否正确
+		
+		var    r     = /^1\d{10}$/,
+	          $thisInput = $('#in-a'),
+		    $thisBtn = $('#tel-sub'),
+			$yanBtn = $(".yanzheng"),
+			$yanInput = $("#in-b");
+		
+		$thisBtn.attr('disabled','disabled').parent('.ui-btn').addClass('ui-state-disabled');
+		$yanBtn.attr('disabled','disabled');
+		$yanInput.attr('disabled','disabled');
+		$thisInput.change(function(e){
+		  var num = $thisInput.val().trim();
+		  
+		  if(r.test(num)){
+			  //判断是否电信号
+			  show_loading_block();
+			  $.getJSON('http://115.28.221.47:8000/apis/CustInfoQuery/?Mobile='+num,function(data){
+				hide_loading_block();
+				if(data.ResultCode!=0){
+					$('#flag').text('请输入正确的电信号码');
+					$yanBtn.attr('disabled','disabled');
+					$yanInput.attr('disabled','disabled');
+				}else {
+					$('#flag').text('');
+					$yanBtn.removeAttr('disabled');
+				}
+
+		 	  });
+		  }else if(!(r.test(num))){
+			$('#flag').text('手机号码格式不正确');
+			$yanBtn.attr('disabled','disabled');
+			$yanInput.attr('disabled','disabled');
+		  }
+		 	
+		});
+		$yanInput.change(function(e){
+  		  var num = $yanInput.val().trim();
+		  if(num==verify_code){
+  			$('#flag1').text('');
+			$thisBtn.removeAttr('disabled').parent('.ui-btn').removeClass('ui-state-disabled');	
+		  }	else{
+  			$('#flag1').text('验证码不正确');
+  			$thisBtn.parent('.ui-btn').addClass('ui-state-disabled').attr('disabled');		  	
+		  }	
+		});
+		
+		
+		$('#form1').submit(function(e){
+			e.preventDefault();
+			show_loading_block();
+			var phone= $thisInput.val().trim();
+			$.ajax({
+				type: "POST",
+				url:"http://115.28.221.47:8000/apis/setbinding/",
+				data:{
+						phone: $thisInput.val().trim(),
+						openid: "123456"
+				},
+
+				dataType: "json"
+			}).done(function(data){
+				hide_loading_block();
+				if(data.flag==1){
+					alert(data.result);
+				}else{
+					alert(data.result);
+				$('#form1')[0].submit();
+				}
+			});
+		})
+	
+	});
+	//====================================
+	//cong.han 2014.4.20
+	//实现tab功能
+	//====================================
+	$(document).delegate('.ui-navbar ul li > a', 'click', function () {
+	    $(this).closest('.ui-navbar').find('a').removeClass('ui-navbar-btn-active');
+	    $(this).addClass('ui-navbar-btn-active');
+	    $('#' + $(this).attr('data-href')).show().siblings('.content_div').hide();
+	});
+	
+	//验证码倒计时
+	var current_time = 0;
+	var verify_code = 0;
+	function count(){
+		$('#count').hide();
+		$('#counting').show();
+		start_count();
+		ramc();
+		$.ajax({
+			type: "POST",
+			url:"http://115.28.221.47:8000/apis/systime/",
+			data:{
+
+			},
+			contentType: "text/xml",
+			dataType: "json"}).done(function(data){
+				alert(data.结果);
+			})
+	};
+	function ramc(){
+		verify_code = 3210;
+		$("#in-b").removeAttr('disabled');
+	  	show_loading_block();
+		$.getJSON('http://115.28.221.47:8000/apis/systime/',function(data){
+		  hide_loading_block();
+	  	}
+	  );
+	}
+	function start_count(){
+		$('#time-count font').text('60');
+		current_time = 60;
+		
+		setTimeout(function _c(){
+			current_time --;
+			$('#time-count font').text(current_time);
+			if (current_time>0){
+				setTimeout(_c, 1000);
+			}else{
+				$('#retry').show();
+				$('#counting').hide();
+			}
+		}, 1000);
+	}
+	
+	function retry(){
+		$('#counting').show();
+		$('#retry').hide();
+		start_count();
+		//TODO 重新获取验证码
+		ramc();
+		$.ajax({
+			type: "POST",
+			url:"http://115.28.221.47:8000/apis/systime/",
+			data:{
+				
+				
+			},
+			contentType: "text/xml",
+			dataType: "json"}).done(function(data){
+				alert(data.结果);
+			})
+		
+	}
+	
+	
+    </script>
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body class="ui-body-c">
+      <div data-role="page" id="bangding">
+	<div data-role="header">
+	  <img src="img/logo.png" height="38">
+	</div>
+    <div data-role="content">
+
+
+         <div data-role="navbar">
+	<h3>帐号绑定</h3>
+            <ul>
+                <li><a href="#" data-href="a" class="ui-btn-active">手机</a></li>
+                <li><a href="#" data-href="b">固话</a></li>
+		<li><a href="#" data-href="c">宽带</a></li>
+            </ul>
+        </div><!-- /navbar -->
+        <div id="a" class="content_div">
+		<form method="post" action="success.html" id="form1">
+		  <div data-role="fieldcontain" class="clearfix">
+
+			<div class="ui-grid">
+				<label for="in-a">手机号:</label>
+				<input type="text" id="in-a" value="">
+				<p id="flag" style="margin:0;margin-left: 90px;font-size: 12px;color: red;"></p>
+			</div>
+			<div class="ui-grid-b yanzheng">
+				  <div class="ui-block-a" id="uiba">
+					<label for="in-b">验证码:</label>
+				  </div>
+				  <div class="ui-block-b">
+					<input type="text" id="in-b">
+				  </div>
+				  <div class="ui-block-c" id="count">
+					<button onclick="count()"  class="label yanzheng" type="button">获取验证码</button>
+				  </div>
+				  
+				  <div class="ui-block-c" id="counting" style="display:none;">
+					<button class="label ui-state-disabled" id="time-count" disabled=disabled type="button"><font>60</font>秒后重新获取</button>
+				  </div>
+				  
+				  <div class="ui-block-c" id="retry" style="display:none;">
+					<button onclick="retry()" class="label" type="button">重新获取</button>
+				  </div>
+  				<p id="flag1" style="margin:0;margin-left: 90px;font-size: 12px;color: red;clear: both"></p>
+				  
+			</div>
+			
+			
+			<input id="tel-sub" type="submit" value="确定">
+		  </div>
+		</form>
+	
+	</div>
+        <div id="b" class="content_div">
+		<form method="post" action="success.html">
+		  <div data-role="fieldcontain" class="clearfix">
+
+			<div class="ui-grid">
+				<label for="in-c">设备号</label>
+				<input type="text" id="in-c">
+			</div>
+			<div class="ui-grid">
+				<label for="in-d">登记人姓名</label>
+				<input type="text" id="in-d">
+			</div>
+
+			<div class="ui-grid">
+				<label for="in-e">身份证号码</label>
+				<input type="text" id="in-e">
+			</div>
+			
+			<input type="submit" value="确定"  disabled="disabled">
+		  </div>
+		</form>	
+	</div>
+	<div id="c" class="content_div">
+		<form method="post" action="success.html">
+		  <div data-role="fieldcontain" class="clearfix">
+
+			<div class="ui-grid">
+				<label for="in-f">设备号</label>
+				<input type="text" id="in-f">
+				忘记
+			</div>
+			<div class="ui-grid">
+				<label for="in-g">登记人姓名</label>
+				<input type="text" id="in-g">
+			</div>
+
+			<div class="ui-grid">
+				<label for="in-h">身份证号码</label>
+				<input type="text" id="in-h">
+			</div>
+			
+			<input type="submit" value="确定"  disabled="disabled">
+		  </div>
+	</div>
+    </div>
+	<div data-role="footer" data-position="fixed">
+          <p class="f">&copy;&nbsp;2014&nbsp;Intel Centrino</p>
+        </div>
+</div>
+
+  </body>
+</html>

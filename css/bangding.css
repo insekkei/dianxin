@@ -1,0 +1,58 @@
+.content_div {
+    display: none;
+}
+.content_div:first-child {
+    display: block;
+}
+form{
+	max-width: 500px;
+	margin: 0 auto;
+}
+.ui-grid,.ui-grid-b.yanzheng{
+	width:80%;
+	margin:0 auto;
+}
+.ui-grid label,.ui-grid .ui-input-text{
+	display:inline-block;
+}
+.ui-grid label,.ui-grid-b.yanzheng  .ui-block-a{
+	width:5em;
+}
+.ui-grid-b.yanzheng  .ui-block-a{
+	margin-right:8px;
+}
+#bangding button.label{
+	font-size: 12px;
+	background: #85af00 !important;
+	color: #fff !important;
+	width:auto;
+	padding: 3px 5px;
+	border-radius: 3px;
+	text-align:center;
+	width:auto;
+	text-decoration:none;
+	text-shadow:0 0 0 transparent !important; 
+	opacity:.8;
+	position:relative;
+	top:10px;
+}
+#bangding button.label:hover{
+	opacity:1;
+}
+#bangding .ui-link.ui-btn.ui-btn-active{
+	background:#85af00;
+	border-color:#85af00;
+	color:#fff;
+	text-shadow:0 0 0 transparent !important; 
+}
+.ui-navbar h3{
+	font-weight:normal;
+	text-align:center;
+}
+#bangding .ui-btn.ui-input-btn.ui-corner-all{
+	background:#577403;
+	color:#fff;
+	width:60%;
+	margin:2em auto;
+	text-shadow:0 0 0 transparent !important; 
+}
